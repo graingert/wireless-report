@@ -38,6 +38,7 @@ The IEEE 802.1X authentication standard has become one of the most well used arc
   \item Southampton University Wireless Society (SUWS).
   \item PaulFertser and the other members of \verb`#linux-wireless` on \verb`irc.freenode.net`.
   \item Tom Blount, José Cubero and Chris Orchard the other members of ELEC6076 Wireless Networks group B.
+  \item Proofreading, Amber Wright.
 \end{itemize}
 \nomenclature{SUWS}{Southampton University Wireless Society}
 
@@ -71,6 +72,7 @@ The authenticator is installed on a switch or wireless AP and `guards' a protect
 Unless 802.1X authentication has been completed, the authenticator will not route any non-EAP packets to the protected areas of the network\cite{8021X-book}. This is in contrast to the captive portal authentication system, also known as web redirection, where clients must be provided with access to the network and allocated an IP address as part of the authentication process\cite{wifi-dog}.
 
 When operating over a wireless network instead of authorizing a particular port as in wired Ethernet a WPA\nomenclature{WPA}{Wi-Fi Protected Access} PMK\nomenclature{PMK}{Pairwise Master Key} is allocated and authorized.  This is known as WPA-802.1X or WPA-Enterprise\cite{IEEE8021X-2004}.
+
 \subsubsection{Supplicant}
 The term ``supplicant'' is sometimes used to refer to a client device or station, or some software package on a client device used to communicate with and transmit authentication credentials to the authenticator.  Throughout this project, the term supplicant will be used to refer to the software package.
 
@@ -127,7 +129,7 @@ To aid in the task of designing a solution, a set of  requirements were drawn up
 
 \section{Implementation}
 \subsection{RADIUS}
-FreeRADIUS was deployed on a RHEL VMWare virtual machine, \verb`kanga-cso1g09e`, by installing the package \verb`freeradius` from the official RHEL package repositories.  A self-signed X.509 certificate key pair was generated, so as to be able to authenticate the RADIUS server to the client supplicant when using EAP-TTLS, although in this project the certificate was ignored because it was assumed that an MITM attack was too unlikely to occur in the short space of time while testing the system.
+FreeRADIUS was deployed on a RHEL VMWare virtual machine, \verb`kanga-cso1g09e`, by installing the package \verb`freeradius` from the official RHEL package repositories.  A self-signed X.509 certificate key pair was generated, so as to be able to authenticate the RADIUS server to the client supplicant when using EAP-TTLS, although in this project the certificate validation stage was skipped because it was assumed that an MITM attack was too unlikely to occur in the short space of time while testing the system.
 
 \nomenclature{RHEL}{Red Hat Enterprise Linux}
 \nomenclature{EAP-TTLS}{EAP Tunneled Transport Layer Security}
@@ -151,10 +153,10 @@ To allow the APs to access the authentication server they must be given access t
 
 The configuration files used to configure \verb`hostapd` on the APs is available in the appendix.  The specific configuration changes needed are to add the authentication server details, add the SSID ``notthebees'' and set the wireless channel.
 
-\subsection{supplicant and 8021.X experiment}
+\subsection{wpa\_supplicant and 802.1X demonstration}
 While it was possible to demonstrate 802.1X working using a single AP at this stage simply by connecting to the ``notthebees'' wireless network from the built in network management tools of various wireless client devices: an Android device, a Fedora Linux laptop and a Ubuntu laptop; it is very difficult to demonstrate that the supplicant can connect to both APs and roam between them from these GUI interfaces.
 
-Both Ubuntu and Fedora provide \verb`wpa_supplicant` by default and configure it automatically using network-manager: a more user friendly interface to wireless configuration.  Rather than allowing network-manager to control \verb`wpa_supplicant` a configuration file, \verb`wpa_supplciant.conf`, was created. This configuration file, while very similar to the \verb`hostapd` configuration with the authentication details required by the protocol, also includes the configuration required by the wireless network - specifically the encryption types for the GTK and PTK and the SSID.  To force the client machine to roam between the different APs the \verb`wpa_cli` command \verb`roam <BSSID>` was issued.  The full output of a successful roam is available in the appendix.
+Both Ubuntu and Fedora provide \verb`wpa_supplicant` by default and configure it automatically using network-manager: a more user friendly interface to wireless configuration.  Rather than allowing network-manager to control \verb`wpa_supplicant` a configuration file, \verb`wpa_supplciant.conf`, was created. This configuration file, while very similar to the \verb`eapol_test` configuration with the authentication details required by the protocol, also includes the configuration required by the wireless network - specifically the encryption types for the GTK and PTK and the SSID.  To force the client machine to roam between the different APs the \verb`wpa_cli` command \verb`roam <BSSID>` was issued.  The full output of a successful roam is available in the appendix.
 
 \nomenclature{BSSID}{BSS Identifier}
 \nomenclature{SSID}{Service Set Identifier}
@@ -171,7 +173,7 @@ When \verb`wpa_supplicant` was configured to support 802.11r the debug informati
 At \verb`rsn_supp/wpa_ft.c` line \verb`00152`, the ``Group Suite Selector'', the group cipher type should be one of \verb`WPA_CIPHER_CCMP` or \verb`WPA_CIPHER_TKIP`.  In the \verb`wpa_cli` debug information, however, we see ``FT: Invalid group cipher (0)'' which shows that the code is receiving an unexpected value of 0 or \verb`WPA_CIPHER_NONE` as defined in \verb`common/defs.h`.  Clearly this is not correct, both the \verb`hostapd` and \verb`wpa_supplicant` configuration requires CCMP encryption for both the GTK and PTK. There was not sufficient time to determine if the root cause of this issue was due to a software error in \verb`wpa_supplicant` or if it was a configuration error and as such this section of the project was unsuccessful in demonstrating an FT roam.
 
 \section{Evaluation}
-The Table \ref{tab:evaluation} relates to the goals in the specification and their status, either completed or not completed.
+Table \ref{tab:evaluation} relates to the goals in the specification and their status, either completed or not completed.
 
 \begin{table}[!hb]
     \label{tab:evaluation}
