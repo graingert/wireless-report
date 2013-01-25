@@ -2,6 +2,7 @@
 
 \usepackage[pdftex]{graphicx}
 \usepackage[utf8x]{inputenc}
+\usepackage{verbatim}
 \usepackage{appendix}
 \usepackage{cite}
 %\usepackage{pgfgantt}
@@ -150,17 +151,18 @@ To allow the APs to access the authentication server they must be given access t
 \subsection{supplicant and 8021.X experiment}
 While it was possible to demonstrate 802.1X working using a single AP at this stage simply by connecting to the ``notthebees'' wireless network from the built in network management tools of various wireless client devices: an Android device, a Fedora Linux laptop and a Ubuntu laptop; it is very difficult to demonstrate that the supplicant can connect to both APs and roam between them from these GUI interfaces.
 
-Both Ubuntu and Fedora provide \verb`wpa_supplicant` by default and configure it automatically using network-manager: a more user friendly interface to wireless configuration.  Rather than allowing network-manager to control \verb`wpa_supplicant` a configuration file, \verb`wpa_supplciant.conf`, was created. This configuration file, while very similar to the \verb`hostapd` configuration with the authentication details required by the protocol, also includes the configuration required by the wireless network - specifically the encryption types for the GTK and PTK and the SSID.  To force the client machine to roam between the different APs the \verb`wpa_cli` command ``roam <BSSID>'' was issued.  The full output of a successful roam is available in the appendix.
-802.11r
+Both Ubuntu and Fedora provide \verb`wpa_supplicant` by default and configure it automatically using network-manager: a more user friendly interface to wireless configuration.  Rather than allowing network-manager to control \verb`wpa_supplicant` a configuration file, \verb`wpa_supplciant.conf`, was created. This configuration file, while very similar to the \verb`hostapd` configuration with the authentication details required by the protocol, also includes the configuration required by the wireless network - specifically the encryption types for the GTK and PTK and the SSID.  To force the client machine to roam between the different APs the \verb`wpa_cli` command \verb`roam <BSSID>` was issued.  The full output of a successful roam is available in the appendix.
 
 \nomenclature{BSSID}{BSS Identifier}
 \nomenclature{SSID}{Service Set Identifier}
 
+\subsection{802.11r}
     % TODO: How to configure on different sections
     % TODO:    On controller
     % TODO:    On access points
     % TODO:    On client supplicant, FT-EAP
     % TODO: \verb`wpa_cli` roam
+
 
 When \verb`wpa_supplicant` was configured with FT-EAP the debug information from \verb`wpa_cli` showed that the connection was unsuccessful.
 
