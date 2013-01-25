@@ -1,6 +1,212 @@
+\verbatiminput{appendix/foo.txt}
 \section{List of Abbreviations}
 \renewcommand{\nomname}{}
 \printnomenclature
 
 \clearpage
-\section{Report Allocation}
+
+\section{RADIUS configuration}
+\label{sec:Code;sub:radius}
+
+\subsection{/etc/raddb/users}
+\begin{verbatim}[frame=single]
+#Give access to this user
+TomB    Cleartext-Password := "TomBsPassword"
+        Reply-Message = "Hello there %{User-Name}! How's it going?"
+
+#Don't give access to this user
+TomG    Auth-Type := Reject
+        Reply-Message = "Oh no you don't Grainger. Not again."
+\end{verbatim}
+
+\subsection{/etc/raddb/clients.conf}
+\begin{verbatim}[frame=single]
+client linuxproj {
+    ipaddr = 152.78.71.57
+    secret = testing123
+    require_message_authenticator = no
+    
+    #Used to specify a specific Network Access Server type
+    #(e.g. cisco, multitech, etc.)
+    nastype = other
+}
+\end{verbatim}
+
+\subsection{/etc/raddb/eap.conf}
+\begin{verbatim}[frame=single]
+tls {
+    certdir = ${confdir}/certs
+    cadir = ${confdir}/certs
+    private_key_password = whatever
+    private_key_file = ${certdir}/server.pem
+    certificate_file = ${certdir}/server.pem
+    CA_file = ${cadir}/ca.pem
+    dh_file = ${certdir}/dh
+    random_file = ${certdir}/random
+    CA_path = ${cadir}
+    cipher_list = "DEFAULT"
+}
+
+ttls {
+    default_eap_type = md5
+    copy_request_to_tunnel = no
+    use_tunneled_reply = no
+    virtual_server = "inner-tunnel"
+}
+\end{verbatim}
+
+\section{Authenticator}
+\label{sec:Code;sub:authenticator}
+
+\subsection{/etc/hostapd/hostapd.conf}
+\subsubsection{802.1X}
+%TODO: add stuff
+
+\subsubsection{802.11r}
+\begin{figure}[h!]
+\begin{verbatim}[frame=single]
+auth_server_addr=152.78.61.5
+auth_server_port=1812
+auth_server_shared_secret=testing123
+disable_pmksa_caching=1
+okc=0
+nas_identifier=kanga-cso1g09e
+eapol_key_index_workaround=1
+ieee8021x=1
+wpa_key_mgmt=FT-EAP WPA-EAP
+auth_algs=1
+wpa=2
+wpa_pairwise=CCMP
+ssid=notthebees
+bridge=br-lan
+wmm_enabled=1
+bssid=00:18:0a:01:3f:38
+ignore_broadcast_ssid=0
+mobility_domain=a1b2
+r0_key_lifetime=100000
+r1_key_holder=000102030406
+reassociation_deadline=1000
+r0kh=00:18:0a:01:3f:3f kanga-cso1g09e
+    000102030405060708090a0b0c0d0e0f
+r1kh=00:18:0a:01:3f:3f 00:01:02:03:04:05
+    000102030405060708090a0b0c0d0e0f
+r1kh=00:18:0a:01:3f:38 00:01:02:03:04:06
+    000102030405060708090a0b0c0d0e0e
+\end{verbatim}
+\caption{Configuration by Chris Orchard}
+\end{figure}
+
+\section{Supplicant}
+\label{sec:Code;sub:supplicant}
+
+\subsection{/etc/wpa\_supplicant/wpa\_supplicant.conf}
+\subsubsection{802.1X}
+\begin{figure}[h!]
+\begin{verbatim}[frame=single]
+ctrl_interface=/var/run/wpa_supplicant
+eapol_version=1
+ap_scan=1
+fast_reauth=1
+
+network={
+        ssid="notthebees"
+        scan_ssid=1
+        key_mgmt=WPA-EAP
+        pairwise=CCMP
+        group=CCMP
+        eap=TTLS
+        identity="TomB"
+        anonymous_identity="anon"
+        password="TomBsPassword"
+        phase2="auth=PAP"
+}
+\end{verbatim}
+\end{figure}
+
+\subsubsection{802.11r}
+\begin{figure}[h!]
+\begin{verbatim}[frame=single]
+ctrl_interface=/var/run/wpa_supplicant
+eapol_version=1
+ap_scan=1
+fast_reauth=1
+
+network={
+        ssid="notthebees"
+        scan_ssid=1
+        key_mgmt=FT-EAP WPA-EAP
+        pairwise=CCMP
+        group=CCMP
+        eap=TTLS
+        identity="TomB"
+        anonymous_identity="anon"
+        password="TomBsPassword"
+        phase2="auth=PAP"
+}
+\end{verbatim}
+\end{figure}
+
+\newpage
+\section{Testing Output}
+
+\subsection{Simulation}
+\label{sec:testing-output;sub:simulation}
+
+\subsection{wpa\_supplicant output}
+\subsubsection{802.1X}
+\label{sec:testing-output;sub:supplicant}
+\begin{figure}[h!]
+\begin{verbatim}[frame=single]
+<3>SME: Trying to authenticate with 00:18:0a:01:3f:38
+    (SSID='notthebees' freq=2412 MHz)
+<3>Trying to associate with 00:18:0a:01:3f:38
+    (SSID='notthebees' freq=2412 MHz)
+<3>SME: Trying to authenticate with 00:18:0a:01:3f:3f
+    (SSID='notthebees' freq=2462 MHz)
+<3>Trying to associate with 00:18:0a:01:3f:3f
+    (SSID='notthebees' freq=2462 MHz)
+<3>Associated with 00:18:0a:01:3f:3f
+<3>CTRL-EVENT-EAP-STARTED EAP authentication started
+...
+<3>CTRL-EVENT-EAP-SUCCESS EAP authentication completed successfully
+<3>WPA: Key negotiation completed with 00:18:0a:01:3f:3f
+    [PTK=CCMP GTK=CCMP]
+<3>CTRL-EVENT-CONNECTED - Connection to 00:18:0a:01:3f:3f
+    completed (reauth) [id=0 id_str=]
+> roam 00:18:0a:01:3f:38
+OK
+<3>SME: Trying to authenticate with 00:18:0a:01:3f:38
+    (SSID='notthebees' freq=2412 MHz)
+<3>Trying to associate with 00:18:0a:01:3f:38
+    (SSID='notthebees' freq=2412 MHz)
+<3>Associated with 00:18:0a:01:3f:38
+<3>CTRL-EVENT-EAP-STARTED EAP authentication started
+...
+<3>CTRL-EVENT-EAP-SUCCESS EAP authentication
+    completed successfully
+<3>WPA: Key negotiation completed with 00:18:0a:01:3f:38
+    [PTK=CCMP GTK=CCMP]
+<3>CTRL-EVENT-CONNECTED - Connection to 00:18:0a:01:3f:38
+    completed (reauth) [id=0 id_str=]
+\end{verbatim}
+\end{figure}
+
+\subsubsection{802.11r}
+\label{sec:testing-output;sub:80211r}
+\begin{figure}[h!]
+\begin{verbatim}[frame=single]
+wlan0: Trying to associate with 00:18:0a:01:3f:38
+    (SSID='notthebees' freq=2412 MHz)
+FT: Invalid group cipher (0)
+wlan0: Authentication with 00:18:0a:01:3f:38 timed out.
+wlan0: Trying to associate with 00:18:0a:01:3f:3f
+    (SSID='notthebees' freq=2462 MHz)
+wlan0: Authentication with 00:18:0a:01:3f:3f timed out.
+wlan0: Trying to associate with 00:18:0a:01:3f:3f
+    (SSID='notthebees' freq=2462 MHz)
+wlan0: Authentication with 00:18:0a:01:3f:3f timed out.
+wlan0: Trying to associate with 00:18:0a:01:3f:38
+    (SSID='notthebees' freq=2412 MHz)
+^Cwlan0: CTRL-EVENT-TERMINATING - signal 2 received
+\end{verbatim}
+\end{figure}
