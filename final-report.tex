@@ -48,7 +48,7 @@ The IEEE 802.1X standard was created to address the constraints of PSK. It contr
 
 \section{Background}
 \subsection{IEEE 802.1X}
-IEEE 802.1X the IEEE Standard for controlling access to wireless and wired LANs\nomenclature{LAN}{Local Area Network} operates by encapsulating EAP over LAN (EAPOL).  The 802.1X authentication process requires three components: the authentication server, the authenticator and the supplicant.  The diagram below shows the structural elements of 802.1X and how EAP is tunneled via EPOL to the authenticator, and then via the Remote Authentication Dial In User Service, RADIUS or Diameter protocols to the authentication server. Although in this project 802.11 wireless Ethernet is used in place of the wired Ethernet shown in Figure \ref{fig:img-1}.
+IEEE 802.1X the IEEE Standard for controlling access to wireless and wired LANs\nomenclature{LAN}{Local Area Network} operates by encapsulating EAP over LAN (EAPOL)\cite{IEEE8021X-2004}.  The 802.1X authentication process requires three components: the authentication server, the authenticator and the supplicant.  The diagram below shows the structural elements of 802.1X and how EAP is tunneled via EPOL to the authenticator, and then via the Remote Authentication Dial In User Service, RADIUS or Diameter protocols to the authentication server. Although in this project 802.11 wireless Ethernet is used in place of the wired Ethernet shown in Figure \ref{fig:img-1}.
 
 \begin{figure}[htb]
 \centering
@@ -73,9 +73,9 @@ Unless 802.1X authentication has been completed, the authenticator will not rout
 When operating over a wireless network instead of authorizing a particular port as in wired Ethernet a WPA\nomenclature{WPA}{Wi-Fi Protected Access} PMK\nomenclature{PMK}{Pairwise Master Key} is allocated and authorized.  This is known as WPA-802.1X or WPA-Enterprise\cite{IEEE8021X-2004}.
 \subsubsection{Supplicant}
 The term ``supplicant'' is sometimes used to refer to a client device or station, or some software package on a client device used to communicate with and transmit authentication credentials to the authenticator.  Throughout this project, the term supplicant will be used to refer to the software package.
-802.11r
 
-When roaming between access points using WPA-PSK client stations are only required to re-generate a PTK\nomenclature{PTK}{Pairwise Transient Key} and GTK\nomenclature{GTK}{Group Temporal Key} from the PMK, generated from the PSK or pass-phrase, using a `four-way handshake'\cite{IEEE80211i-2004}.  In comparison when using WPA-802.1X the client station must obtain a PMK via a complete 802.1X authentication process every time time it roams to a new access point, this process can be fairly time consuming and can cause noticeable degradation to network applications that require high availability and low latency, such as streaming media or VOIP \nomenclature{VOIP}{Voice Over  IP}\cite{voip-time}.  To solve this issue IEEE 802.11r-2008 or fast BSS transition (FT) allows a client station to roam between access points without needing to renegotiate a key with the 802.1X authentication server.
+\subsection{802.11r}
+When roaming between access points using WPA-PSK client stations are only required to re-generate a PTK\nomenclature{PTK}{Pairwise Transient Key} and GTK\nomenclature{GTK}{Group Temporal Key} from the PMK, generated from the PSK or pass-phrase, using a `four-way handshake'\cite{IEEE80211i-2004}.  In comparison when using WPA-802.1X the client station must obtain a PMK via a complete 802.1X authentication process every time time it roams to a new access point, this process can be fairly time consuming and can cause noticeable degradation to network applications that require high availability and low latency, such as streaming media or VOIP \nomenclature{VOIP}{Voice Over  IP}\cite{voip-time}.  To solve this issue IEEE 802.11r-2008 or fast BSS transition (FT) allows a client station to roam between access points without needing to renegotiate a key with the 802.1X authentication server\cite{IEEE80211r-2008}.
 
 \nomenclature{FT}{fast BSS transition}
 \nomenclature{BSS}{Basic Service Set}
@@ -90,7 +90,9 @@ The 802.1X authenticator chosen was `\verb`hostapd` running on Meraki Mini hardw
 
 \nomenclature{EULA}{End User License Agreement}
 
-All experiments simulating a system over a wired or local Unix socket connection the test program \verb`eapol_test` was used. All experiments using a real wireless network were conducted with Linux machines running `\verb`wpa_supplicant`'. These were selected as opposed to any of the closed source implementations as these did not provide the control over configuration and debug information required for the project; specifically the ability to force a client access point to roam between nodes.  The supplicant, \verb`wpa_supplicant`, it's controlling interfaces \verb`wpa_cli` and \verb`wpa_gui`, the authenticator \verb`hostapd` and the test program \verb`eapol_test` are all provided by a single project: `\verb`hostapd` and \verb`wpa_supplicant`' by Jouni Malinen et al\cite{wpa-hostapd}.
+All experiments simulating a system over a wired or local Unix socket connection the test program \verb`eapol_test` was used. \verb`eapol_test` is designed to test that EAPOL system is working correctly by simulating an EAPOL authentication process.
+
+All experiments using a real wireless network were conducted with Linux machines running `\verb`wpa_supplicant`'. These were selected as opposed to any of the closed source implementations as these did not provide the control over configuration and debug information required for the project; specifically the ability to force a client access point to roam between nodes.  The supplicant, \verb`wpa_supplicant`, it's controlling interfaces \verb`wpa_cli` and \verb`wpa_gui`, the authenticator \verb`hostapd` and the test program \verb`eapol_test` are all provided by a single project: `\verb`hostapd` and \verb`wpa_supplicant`' by Jouni Malinen et al\cite{wpa-hostapd}.
 
 \section{Specification}
 To aid in the task of designing a solution, a set of  requirements were drawn up with MOSCOW priority attached to each. These requirements were derived from the technical background research of the project.  Each of these tasks were then subdivided into further subtasks required to achieve that task.
@@ -145,8 +147,9 @@ To allow the APs to access the authentication server they must be given access t
 \nomenclature{VPN}{Virtual Private Network}
 \nomenclature{NAT}{Network Address Translation}
 
-    % TODO: see config files
-    % TODO: \verb`eapol_test` cross compile
+\verb`eapol_test` was then used to test that the EAPOL connection to the authentication server was working correctly over this fairly complicated connection.  Because \verb`eapol_test` cannot be installed into an image using the OpenWrt build tools it must be cross-compiled manually.
+
+The configuration files used to configure \verb`hostapd` on the APs is available in the appendix.  The specific configuration changes needed are to add the authentication server details, add the SSID ``notthebees'' and set the wireless channel.
 
 \subsection{supplicant and 8021.X experiment}
 While it was possible to demonstrate 802.1X working using a single AP at this stage simply by connecting to the ``notthebees'' wireless network from the built in network management tools of various wireless client devices: an Android device, a Fedora Linux laptop and a Ubuntu laptop; it is very difficult to demonstrate that the supplicant can connect to both APs and roam between them from these GUI interfaces.
@@ -157,14 +160,13 @@ Both Ubuntu and Fedora provide \verb`wpa_supplicant` by default and configure it
 \nomenclature{SSID}{Service Set Identifier}
 
 \subsection{802.11r}
-    % TODO: How to configure on different sections
-    % TODO:    On controller
-    % TODO:    On access points
-    % TODO:    On client supplicant, FT-EAP
-    % TODO: \verb`wpa_cli` roam
 
+The version of \verb`hostapd` included by OpenWrt does not include support for 802.11r and must be explicitly enabled in the \verb`hostapd` build configuration and the OpenWrt image re-built.  \verb`hostapd` must then be reconfigured to enable 802.11r, specifically FT-EAP must be added key management option and the 802.11r key holders must be configured with the same shared encryption keys.
 
-When \verb`wpa_supplicant` was configured with FT-EAP the debug information from \verb`wpa_cli` showed that the connection was unsuccessful.
+The version of \verb`wpa_supplicant` packaged for Ubuntu already has 802.11r support and so the only configuration change needed is to add FT-EAP to the key management options of \verb`wpa_supplicant.conf`.
+
+\subsubsection{802.11r experiment}
+When \verb`wpa_supplicant` was configured to support 802.11r the debug information from \verb`wpa_cli` showed that the connection was unsuccessful.
 
 At \verb`rsn_supp/wpa_ft.c` line \verb`00152`, the ``Group Suite Selector'', the group cipher type should be one of \verb`WPA_CIPHER_CCMP` or \verb`WPA_CIPHER_TKIP`.  In the \verb`wpa_cli` debug information, however, we see ``FT: Invalid group cipher (0)'' which shows that the code is receiving an unexpected value of 0 or \verb`WPA_CIPHER_NONE` as defined in \verb`common/defs.h`.  Clearly this is not correct, both the \verb`hostapd` and \verb`wpa_supplicant` configuration requires CCMP encryption for both the GTK and PTK. There was not sufficient time to determine if the root cause of this issue was due to a software error in \verb`wpa_supplicant` or if it was a configuration error and as such this section of the project was unsuccessful in demonstrating an FT roam.
 
