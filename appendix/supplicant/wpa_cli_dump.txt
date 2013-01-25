@@ -1,0 +1,20 @@
+<3>SME: Trying to authenticate with 00:18:0a:01:3f:38 (SSID='notthebees' freq=2412 MHz)
+<3>Trying to associate with 00:18:0a:01:3f:38 (SSID='notthebees' freq=2412 MHz)
+<3>SME: Trying to authenticate with 00:18:0a:01:3f:3f (SSID='notthebees' freq=2462 MHz)
+<3>Trying to associate with 00:18:0a:01:3f:3f (SSID='notthebees' freq=2462 MHz)
+<3>Associated with 00:18:0a:01:3f:3f
+<3>CTRL-EVENT-EAP-STARTED EAP authentication started
+...
+<3>CTRL-EVENT-EAP-SUCCESS EAP authentication completed successfully
+<3>WPA: Key negotiation completed with 00:18:0a:01:3f:3f [PTK=CCMP GTK=CCMP]
+<3>CTRL-EVENT-CONNECTED - Connection to 00:18:0a:01:3f:3f completed (reauth) [id=0 id_str=]
+> roam 00:18:0a:01:3f:38
+OK
+<3>SME: Trying to authenticate with 00:18:0a:01:3f:38 (SSID='notthebees' freq=2412 MHz)
+<3>Trying to associate with 00:18:0a:01:3f:38 (SSID='notthebees' freq=2412 MHz)
+<3>Associated with 00:18:0a:01:3f:38
+<3>CTRL-EVENT-EAP-STARTED EAP authentication started
+...
+<3>CTRL-EVENT-EAP-SUCCESS EAP authentication completed successfully
+<3>WPA: Key negotiation completed with 00:18:0a:01:3f:38 [PTK=CCMP GTK=CCMP]
+<3>CTRL-EVENT-CONNECTED - Connection to 00:18:0a:01:3f:38 completed (reauth) [id=0 id_str=]

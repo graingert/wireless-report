@@ -1,0 +1,7 @@
+#Give access to this user
+TomB    Cleartext-Password := "TomBsPassword"
+        Reply-Message = "Hello there %{User-Name}! How's it going?"
+
+#Don't give access to this user
+TomG    Auth-Type := Reject
+        Reply-Message = "Oh no you don't Grainger. Not again."
