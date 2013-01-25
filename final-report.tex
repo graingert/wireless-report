@@ -162,8 +162,9 @@ Both Ubuntu and Fedora provide \verb`wpa_supplicant` by default and configure it
 \nomenclature{SSID}{Service Set Identifier}
 
 \subsection{802.11r}
+Because 802.11r is designed to avoid making an extra round trip to the authentication server, no changes are required to FreeRadius.
 
-The version of \verb`hostapd` included by OpenWrt does not include support for 802.11r and must be explicitly enabled in the \verb`hostapd` build configuration and the OpenWrt image re-built.  \verb`hostapd` must then be reconfigured to enable 802.11r, specifically FT-EAP must be added key management option and the 802.11r key holders must be configured with the same shared encryption keys.
+The version of \verb`hostapd` included by OpenWrt does not include support for 802.11r and this support must be explicitly enabled in the \verb`hostapd` build configuration and the OpenWrt image re-built.  \verb`hostapd` must then be reconfigured to enable 802.11r, specifically FT-EAP must be added key management option and the 802.11r key holders must be configured with the same shared encryption keys.  The updated configuration files are listed in the appendix.
 
 The version of \verb`wpa_supplicant` packaged for Ubuntu already has 802.11r support and so the only configuration change needed is to add FT-EAP to the key management options of \verb`wpa_supplicant.conf`.
 
